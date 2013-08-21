@@ -81,7 +81,7 @@ assert_eq(endTime(0, melody2_mus), 1500,
        'Four note test');
 
 
-//TEST for compile
+//TEST for compile without "par"
 
 var melody1_mus = { tag: 'note', pitch: 'a4', dur: 125 };
 var melody1_note = [ 
@@ -112,4 +112,27 @@ eval(answer);
 assert_eq(compile(melody1_mus), melody1_note,
        'One note test');
 assert_eq(compile(melody2_mus), melody2_note,
+       'Four note test');
+
+//TEST for compile with "par"
+var melody_mus = 
+    { tag: 'seq',
+      left: 
+       { tag: 'par',
+         left: { tag: 'note', pitch: 'c3', dur: 250 },
+         right: { tag: 'note', pitch: 'g4', dur: 500 } },
+      right:
+       { tag: 'par',
+         left: { tag: 'note', pitch: 'd3', dur: 500 },
+         right: { tag: 'note', pitch: 'f4', dur: 250 } } };
+var melody_note = [
+    { tag: 'note', pitch: 'c3', start: 0, dur: 250 },
+    { tag: 'note', pitch: 'g4', start: 0, dur: 500 },
+    { tag: 'note', pitch: 'd3', start: 500, dur: 500 },
+    { tag: 'note', pitch: 'f4', start: 500, dur: 250 } ];
+
+jshint(answer);
+eval(answer);
+
+assert_eq(compile(melody_mus), melody_note,
        'Four note test');

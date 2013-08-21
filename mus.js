@@ -51,9 +51,11 @@ var endTime = function (time, expr) {
 
 	if(expr.tag === 'note'){
 		return time + expr.dur;	
-	} else if (expr.tag === 'seq' ) {
+	}else if (expr.tag === 'seq' ){
 		return endTime( endTime(time, expr.left), expr.right);
-	} else {
+	}else if(expr.tag === 'par'){
+		return Math.max(endTime(time, expr.left), endTime(time, expr.right));
+	}else{
 		throw new Error("Invalid expression syntax.");
 	}	
 };
@@ -76,19 +78,38 @@ var endTime = function (time, expr) {
 *      right: { tag: 'note', pitch: 'd4', dur: 500 } } }
 * 
 * Compiled NOTE version
-* ====================
+* =====================
 * [ { tag: 'note', pitch: 'a4', start: 0, dur: 250 },
 *   { tag: 'note', pitch: 'b4', start: 250, dur: 250 },
 *   { tag: 'note', pitch: 'c4', start: 500, dur: 500 },
 *   { tag: 'note', pitch: 'd4', start: 1000, dur: 500 } ]
 * 
+* MUS Song with "par"tag:
+* =======================
+*{ tag: 'seq',
+*      left: 
+*       { tag: 'par',
+*         left: { tag: 'note', pitch: 'c3', dur: 250 },
+*         right: { tag: 'note', pitch: 'g4', dur: 500 } },
+*      right:
+*       { tag: 'par',
+*         left: { tag: 'note', pitch: 'd3', dur: 500 },
+*         right: { tag: 'note', pitch: 'f4', dur: 250 } } };
+* Compiled NOTE version with "par" tag:
+* =====================================
+*[
+*    { tag: 'note', pitch: 'c3', start: 0, dur: 250 },
+*    { tag: 'note', pitch: 'g4', start: 0, dur: 500 },
+*    { tag: 'note', pitch: 'd3', start: 500, dur: 500 },
+*    { tag: 'note', pitch: 'f4', start: 500, dur: 250 } ];
+*
 */
 
-var compile = function(mus){	
+var compile = function(mus, startTime){	
 	var notes = [];
 	var queue = [];
 	var expr = null;
-	var totalTime = 0;
+	var totalTime = startTime || 0;
 
 	var addToTop = function(array, element){
 		array.splice(0, 0, element);
@@ -105,10 +126,6 @@ var compile = function(mus){
 	while(queue.length){
 		expr = popFirst(queue);
 		
-		if(notes.length){
-			lastExpr = notes[notes.length - 1];
-		}
-
 		if(expr.tag === 'note'){
 			notes.push({
 				tag: expr.tag,
@@ -118,10 +135,15 @@ var compile = function(mus){
 			});
 
 			totalTime = endTime(totalTime, expr);
+
 		}else if(expr.tag === 'seq'){
 			addToTop(queue, expr.right);
 			addToTop(queue, expr.left);
-		}else{
+		}else if(expr.tag === 'par'){
+			notes = notes.concat(compile(expr.left, totalTime).concat(compile(expr.right, totalTime)));
+			totalTime = endTime(totalTime, expr);
+		}
+		else{
 			throw new Error("Invalid expression syntax.");	
 		}
 	}
