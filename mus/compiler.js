@@ -9,7 +9,7 @@ var endTime = function (time, expr) {
 		throw new Error("Invalid expression syntax.");
 	}
 
-	if(expr.tag === 'note'){
+	if(expr.tag === 'note' || expr.tag === 'rest'){
 		return time + expr.dur;	
 	}else if (expr.tag === 'seq' ){
 		return endTime( endTime(time, expr.left), expr.right);
@@ -93,7 +93,6 @@ var compile = function(mus, startTime){
 				start: totalTime,
 				dur: expr.dur
 			});
-
 			totalTime = endTime(totalTime, expr);
 
 		}else if(expr.tag === 'seq'){
@@ -102,6 +101,15 @@ var compile = function(mus, startTime){
 		}else if(expr.tag === 'par'){
 			notes = notes.concat(compile(expr.left, totalTime).concat(compile(expr.right, totalTime)));
 			totalTime = endTime(totalTime, expr);
+		}else if(expr.tag === 'rest'){
+			notes.push({
+				tag: expr.tag,
+				pitch: '',
+				start: totalTime,
+				dur: expr.dur
+			});
+
+			totalTime = endTime(totalTime, expr);			
 		}
 		else{
 			throw new Error("Invalid expression syntax.");	
