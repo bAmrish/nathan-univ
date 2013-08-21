@@ -70,7 +70,7 @@ var endTime = function (time, expr) {
 		case 'par':
 			return Math.max(endTime(time, expr.left), endTime(time, expr.right));
 		default:
-			throw new Error("Invalid expression syntax.");		
+			throw new Error("Invalid expression syntax: " + JSON.stringify(expr));		
 	}
 };
 
@@ -125,6 +125,15 @@ var compile = function(mus, startTime){
 
 				notes = notes.concat(compile(expr.left, totalTime).concat(compile(expr.right, totalTime)));
 				totalTime = endTime(totalTime, expr);
+
+				break;
+
+			case 'repeat':
+
+				for(var i = 0; i < expr.count; i++){
+					notes = notes.concat(compile(expr.section, totalTime));
+					totalTime = endTime(totalTime, expr.section);
+				}
 
 				break;
 
