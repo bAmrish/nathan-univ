@@ -5,19 +5,17 @@
 * the function should return the time when expr finishes.
 */
 var endTime = function (time, expr) {
-	if(!expr){
-		throw new Error("Invalid expression syntax.");
+	switch(expr.tag){
+		case 'note':
+		case 'rest':
+			return time + expr.dur;	
+		case 'seq':
+			return endTime( endTime(time, expr.left), expr.right);
+		case 'par':
+			return Math.max(endTime(time, expr.left), endTime(time, expr.right));
+		default:
+			throw new Error("Invalid expression syntax.");		
 	}
-
-	if(expr.tag === 'note' || expr.tag === 'rest'){
-		return time + expr.dur;	
-	}else if (expr.tag === 'seq' ){
-		return endTime( endTime(time, expr.left), expr.right);
-	}else if(expr.tag === 'par'){
-		return Math.max(endTime(time, expr.left), endTime(time, expr.right));
-	}else{
-		throw new Error("Invalid expression syntax.");
-	}	
 };
 
 /*
@@ -85,34 +83,38 @@ var compile = function(mus, startTime){
 
 	while(queue.length){
 		expr = popFirst(queue);
-		
-		if(expr.tag === 'note'){
-			notes.push({
-				tag: expr.tag,
-				pitch: expr.pitch,
-				start: totalTime,
-				dur: expr.dur
-			});
-			totalTime = endTime(totalTime, expr);
 
-		}else if(expr.tag === 'seq'){
-			addToTop(queue, expr.right);
-			addToTop(queue, expr.left);
-		}else if(expr.tag === 'par'){
-			notes = notes.concat(compile(expr.left, totalTime).concat(compile(expr.right, totalTime)));
-			totalTime = endTime(totalTime, expr);
-		}else if(expr.tag === 'rest'){
-			notes.push({
-				tag: expr.tag,
-				pitch: '',
-				start: totalTime,
-				dur: expr.dur
-			});
+		switch(expr.tag){
+			case 'note':
+			case 'rest':
+				
+				notes.push({
+					tag: expr.tag,
+					pitch: expr.pitch || '',
+					start: totalTime,
+					dur: expr.dur
+				});
 
-			totalTime = endTime(totalTime, expr);			
-		}
-		else{
-			throw new Error("Invalid expression syntax.");	
+				totalTime = endTime(totalTime, expr);
+
+				break;
+
+			case 'seq':
+				
+				addToTop(queue, expr.right);
+				addToTop(queue, expr.left);
+
+				break;
+
+			case 'par':
+
+				notes = notes.concat(compile(expr.left, totalTime).concat(compile(expr.right, totalTime)));
+				totalTime = endTime(totalTime, expr);
+
+				break;
+
+			default:
+				throw new Error("Invalid expression syntax.");		
 		}
 	}
 
