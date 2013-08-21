@@ -150,3 +150,5 @@ var compile = function(mus, startTime){
 
 	return notes;
 };
+
+exports.compile = compile;
