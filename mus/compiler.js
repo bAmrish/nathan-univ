@@ -1,3 +1,59 @@
+var convertPitch = function(noteName){	
+	var noteSplit = [], letterPitch, octave, noteNameLength;
+	//Reference http://www.midimountain.com/midi/midi_note_numbers.html
+	var midiNoteMap = {
+		'c': 0,
+		'c#': 1,
+		'd': 2,
+		'd#': 3,
+		'e': 4,
+		'f': 5,
+		'f#': 6,
+		'g': 7,
+		'g#': 8,
+		'a': 9,
+		'a#': 10,
+		'b': 11
+	}
+
+	if(!noteName){
+		throw new Exception("Invalid noteName " + noteName);
+	}
+
+	noteNameLength = noteName.length;
+
+	
+	//check if the noteName contains # 
+	if(noteName.indexOf('#') > 0){
+
+		//if so the length of the nodeName cannot be greater than 4.
+		if(noteNameLength !== 3 || noteNameLength !== 4){
+			throw new Exception("Invalid noteName " + noteName);
+		}
+
+		//if so split on '#'		
+		noteSplit = note.split('#');
+
+		//letterPitch will be the first part but we have to appned '#'
+		letterPitch = midiNoteMap[noteSplit[0].toLowerCase() + '#'];
+
+		//octave would be the rest of it.
+		octave = parseInt(noteName[1], 10);	
+
+	}else if(noteNameLength === 2 || noteNameLength === 3){
+		//else the node name has to be either 2 or 3 letter.
+
+		letterPitch = midiNoteMap[noteName[0].toLowerCase()];
+		octave = parseInt([].splice.call(noteName, 1, noteNameLength).join(''), 10);	
+	}else{
+		throw new Exception("Invalid noteName " + noteName);
+	}	
+	
+
+	return (12 + 12 * octave + letterPitch);
+};
+
+
 /**
 * Write a function endTime that takes a start time 
 * time in milliseconds and a MUS expression expr.
@@ -20,47 +76,6 @@ var endTime = function (time, expr) {
 
 /*
 * Write a function compile that compiles MUS songs into NOTE songs.
-* 
-*  Example:
-* 
-*  MUS Song:
-*  =========
-*  { tag: 'seq',
-*   left: 
-*    { tag: 'seq',
-*      left: { tag: 'note', pitch: 'a4', dur: 250 },
-*      right: { tag: 'note', pitch: 'b4', dur: 250 } },
-*   right:
-*    { tag: 'seq',
-*      left: { tag: 'note', pitch: 'c4', dur: 500 },
-*      right: { tag: 'note', pitch: 'd4', dur: 500 } } }
-* 
-* Compiled NOTE version
-* =====================
-* [ { tag: 'note', pitch: 'a4', start: 0, dur: 250 },
-*   { tag: 'note', pitch: 'b4', start: 250, dur: 250 },
-*   { tag: 'note', pitch: 'c4', start: 500, dur: 500 },
-*   { tag: 'note', pitch: 'd4', start: 1000, dur: 500 } ]
-* 
-* MUS Song with "par"tag:
-* =======================
-*{ tag: 'seq',
-*      left: 
-*       { tag: 'par',
-*         left: { tag: 'note', pitch: 'c3', dur: 250 },
-*         right: { tag: 'note', pitch: 'g4', dur: 500 } },
-*      right:
-*       { tag: 'par',
-*         left: { tag: 'note', pitch: 'd3', dur: 500 },
-*         right: { tag: 'note', pitch: 'f4', dur: 250 } } };
-* Compiled NOTE version with "par" tag:
-* =====================================
-*[
-*    { tag: 'note', pitch: 'c3', start: 0, dur: 250 },
-*    { tag: 'note', pitch: 'g4', start: 0, dur: 500 },
-*    { tag: 'note', pitch: 'd3', start: 500, dur: 500 },
-*    { tag: 'note', pitch: 'f4', start: 500, dur: 250 } ];
-*
 */
 
 var compile = function(mus, startTime){	
@@ -90,7 +105,7 @@ var compile = function(mus, startTime){
 				
 				notes.push({
 					tag: expr.tag,
-					pitch: expr.pitch || '',
+					pitch: convertPitch(expr.pitch) || '',
 					start: totalTime,
 					dur: expr.dur
 				});
