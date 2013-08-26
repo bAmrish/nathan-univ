@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var tester = require('./tester.js')
 
-tester.read('grammers/scheme-grammer-enhanced.pegjs', function(){			
+tester.read('grammers/scheme-grammer.pegjs', function(){			
 	expect(tester.eval("")).to.eql(undefined);
 	expect(tester.eval("atom")).to.eql("atom");
 	expect(tester.eval("+")).to.eql("+");
