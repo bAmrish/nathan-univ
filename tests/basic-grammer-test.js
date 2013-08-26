@@ -1,7 +1,7 @@
 var expect = require('expect.js');
 var tester = require('./tester.js')
 
-tester.read('grammers/grammer.pegjs', function(){
+tester.read('grammers/basic-grammer.pegjs', function(){
 	expect(tester.eval("")).to.be(undefined);
 	expect(tester.eval("dog")).to.eql(["dog"]);	
 	expect(tester.eval("black dog")).to.eql(["black", "dog"]);
