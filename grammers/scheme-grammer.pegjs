@@ -13,15 +13,9 @@ expressions
 
 
 expression
-	= SEP* atom:atom SEP* {
-		return atom;
-	} 
-	/ SEP* "(" SEP* atoms:atoms SEP* ")" {
-		return atoms; 
-	} 
-	/ SEP* quote:quote {
-		return quote;
-	}  
+	= atoms SEP* "(" SEP* expression:expression SEP* ")"
+	/ quote
+	/ atoms
 	/ SEP* "(" SEP* quote:quote SEP* ")" {
 		return quote;
 	}
@@ -39,7 +33,7 @@ expression
 	}
 
 quote
-	= "'" expression:expression {
+	= SEP* "'" expression:expression SEP* {
 		var newVal = ["quote"]
 		newVal.push(expression);
 		return newVal;
@@ -47,7 +41,7 @@ quote
 
 
 atoms
-	= first:atom rest:(SEP atom:atom {return atom;})* {
+	= SEP* first:atom rest:(SEP* atom:atom {return atom;})* {
 		if(rest.length){
 			return [first].concat(rest);
 		} else {
