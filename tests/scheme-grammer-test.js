@@ -2,7 +2,6 @@ var expect = require('expect.js');
 var tester = require('./tester.js')
 
 tester.read('grammers/scheme-grammer.pegjs', function(){			
-	tester.logging = false;
 	expect(tester.eval("")).to.eql(undefined);
 	expect(tester.eval("atom")).to.eql("atom");
 	expect(tester.eval("+")).to.eql("+");
@@ -14,4 +13,6 @@ tester.read('grammers/scheme-grammer.pegjs', function(){
 	expect(tester.eval("(+ 1 (f x (- 3 \t\t 4)          y))\n(- 2 3)")).to.eql([["+", "1", ["f", "x", ["-", "3", "4"], "y"]], ["-", "2", "3"]]);
 	expect(tester.eval("('x)")).to.eql(["quote", "x"]);
 	expect(tester.eval("('(1 2 3))")).to.eql(["quote", ["1", "2", "3"]]);
+	expect(tester.eval(";;This comment should be ignored")).to.eql("");
+	expect(tester.eval("(1 2 3) ;;This comment should be ignored")).to.eql(["1", "2", "3"]);
 });
