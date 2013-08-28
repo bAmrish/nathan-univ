@@ -1,7 +1,7 @@
 var expect = require('expect.js');
-var tester = require('./tester.js');
+var tester = require('../tests/tester.js');
 
-tester.read('grammers/mus-grammer.pegjs', function(){		
+tester.read('mus/mus-grammer.pegjs', function(){		
 
 	var tests = [
 		{
