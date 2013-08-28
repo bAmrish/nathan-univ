@@ -53,7 +53,8 @@ atoms
 	/ atom
 
 atom
-	= chars:validchars+ {
+	= numbers 
+	/ chars:validchars+ {
 		return chars.join(""); 
 	}
 
@@ -75,6 +76,11 @@ SEP
 
 NL
 	= [\n]+
+
+numbers 
+	= numbers:[0-9]+ {
+		return parseInt(numbers.join(''));
+	}
 
 validchars
 	= [0-9a-zA-Z_?!+\-=@#$%^&*/.]
