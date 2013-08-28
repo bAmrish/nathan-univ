@@ -13,8 +13,8 @@ tester.read('scheem/scheem-grammar.pegjs', function(){
 	expect(tester.eval("(f x 3 y)")).to.deep.equal(["f", "x", 3, "y"]);
 	expect(tester.eval("(+ 1 (f x 3 y))")).to.deep.equal(["+", 1, ["f", "x", 3, "y"]]);
 	expect(tester.eval("(+ 1 (f x (- 3 4) y))")).to.deep.equal(["+", 1, ["f", "x", ["-", 3, 4], "y"]]);
-	expect(tester.eval("(+ 1 (f x (- 3 4) y))\n(- 2 3)")).to.deep.equal([["+", 1, ["f", "x", ["-", 3, 4], "y"]], ["-", 2, 3]]);
-	expect(tester.eval("(+ 1 (f x (- 3 \t\t 4)          y))\n(- 2 3)")).to.deep.equal([["+", 1, ["f", "x", ["-", 3, 4], "y"]], ["-", 2, 3]]);
+	expect(tester.eval("(+ 1 (f x (- 3 4) y))\n(- 2 3)")).to.deep.equal(['begin', ["+", 1, ["f", "x", ["-", 3, 4], "y"]], ["-", 2, 3]]);
+	expect(tester.eval("(+ 1 (f x (- 3 \t\t 4)          y))\n(- 2 3)")).to.deep.equal(['begin', ["+", 1, ["f", "x", ["-", 3, 4], "y"]], ["-", 2, 3]]);
 	expect(tester.eval("('x)")).to.deep.equal(["quote", "x"]);
 	expect(tester.eval("('(1 2 3))")).to.deep.equal(["quote", [1, 2, 3]]);
 	expect(tester.eval(";;This comment should be ignored")).to.deep.equal("");

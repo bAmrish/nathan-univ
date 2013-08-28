@@ -19,7 +19,7 @@ expressions
 	
 	/ first:expression rest:(NL expression:expression {return expression} )* NL* {
     	if(rest.length){
-        	return [first].concat(rest);
+        	return ['begin', first].concat(rest);
     	} else {
         	return first;
     	}
