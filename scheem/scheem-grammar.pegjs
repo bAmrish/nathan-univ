@@ -30,7 +30,10 @@ expressions
 
 expression
 	= SEP* "(" SEP* expression:expression SEP* ")" SEP* {
-		return expression
+		if(!isArray(expression)){
+			return [expression];
+		}
+		return expression;
 	}	
 	/ first:atoms rest:expression* {
     	if(rest.length){
